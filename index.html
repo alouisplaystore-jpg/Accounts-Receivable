@@ -258,6 +258,54 @@
         </div>
     </div>
 
+    <!-- Modal เลือกส่งข้อมูลให้ลูกค้า -->
+    <div id="shareCustomerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-3 mb-3 border-b border-slate-100">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">📤 ส่งข้อมูลให้ลูกค้า</h2>
+                    <p class="text-xs text-slate-400" id="shareBorrowerSubtitle">ผู้กู้: -</p>
+                </div>
+                <button onclick="closeShareCustomerModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-lg">✕</button>
+            </div>
+
+            <div class="space-y-2.5 mb-3">
+                <div class="text-xs font-semibold text-slate-600">เลือกรูปแบบข้อมูลที่ต้องการส่ง:</div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="selectShareMode('balance')" id="shareMode-balance"
+                        class="py-2.5 px-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-sm transition text-center">
+                        💵 ยอดคงเหลือ
+                    </button>
+                    <button type="button" onclick="selectShareMode('payments')" id="shareMode-payments"
+                        class="py-2.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 transition text-center">
+                        📜 การจ่ายเงิน
+                    </button>
+                    <button type="button" onclick="selectShareMode('both')" id="shareMode-both"
+                        class="py-2.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 transition text-center">
+                        📦 ส่งทั้ง 2 อย่าง
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3.5">
+                <label class="block text-xs font-medium text-slate-600 mb-1">ตัวอย่างข้อความที่จะส่ง (แก้ไขเพิ่มเติมได้)</label>
+                <textarea id="sharePreviewText" rows="8"
+                    class="w-full rounded-xl border border-slate-300 p-3 text-xs leading-relaxed bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+                <button type="button" onclick="copyShareText()"
+                    class="w-full bg-slate-100 active:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-xs border border-slate-200">
+                    📋 คัดลอกข้อความ
+                </button>
+                <button type="button" onclick="sendShareText()"
+                    class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs shadow-md">
+                    🚀 แชร์ / ส่งให้ลูกค้า
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal คำนวณเงินกู้ล่วงหน้า (Simulator) -->
     <div id="simulatorModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center">
         <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[90vh] overflow-y-auto">
@@ -325,6 +373,8 @@
         let loans = JSON.parse(localStorage.getItem('loanTrackerMobileData')) || [];
         let currentFilter = 'unpaid';
         let currentMainTab = 'loans';
+        let sharingLoanId = null;
+        let currentShareMode = 'balance';
 
         function getCurrentLocalDateTime() {
             const now = new Date();
@@ -342,7 +392,6 @@
         }
         initReportDates();
 
-        // ฟังก์ชันสลับหน้าหลัก (เด็ดขาด - หน้าใครหน้ามัน)
         function switchMainTab(tab) {
             currentMainTab = tab;
             const tLoans = document.getElementById('mTab-loans');
@@ -408,6 +457,108 @@
         }
 
         function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
+
+        function openShareCustomerModal(loanId) {
+            const loan = loans.find(l => l.id === loanId);
+            if (!loan) return;
+            sharingLoanId = loanId;
+            document.getElementById('shareBorrowerSubtitle').innerText = `ผู้กู้: ${loan.name}`;
+            selectShareMode('balance');
+            document.getElementById('shareCustomerModal').classList.remove('hidden');
+        }
+
+        function closeShareCustomerModal() {
+            sharingLoanId = null;
+            document.getElementById('shareCustomerModal').classList.add('hidden');
+        }
+
+        function selectShareMode(mode) {
+            currentShareMode = mode;
+            ['balance', 'payments', 'both'].forEach(m => {
+                const btn = document.getElementById('shareMode-' + m);
+                if (m === mode) {
+                    btn.className = 'py-2.5 px-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-sm transition text-center';
+                } else {
+                    btn.className = 'py-2.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 transition text-center';
+                }
+            });
+            updateSharePreview();
+        }
+
+        function buildCustomerShareText(loan, mode) {
+            const calc = calculateLoanDetails(loan);
+            const loanDateFmt = new Date(loan.loanDateTime).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+            const typeMap = {
+                none: 'ไม่คิดดอกเบี้ย',
+                daily: `รายวัน ${loan.interestRate}%`,
+                monthly: `รายเดือน ${loan.interestRate}%`
+            };
+
+            let lines = [
+                `📋 รายละเอียดบัญชีเงินกู้: ${loan.name}`,
+                `🕒 วันที่กู้: ${loanDateFmt} น. (${typeMap[loan.interestType]})`
+            ];
+
+            if (mode === 'balance' || mode === 'both') {
+                lines.push(
+                    `--------------------------`,
+                    `💵 ยอดคงเหลือปัจจุบัน`,
+                    `• เงินต้นคงเหลือ: ${loan.principal.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ฿`,
+                    `• ดอกเบี้ยสะสม (${calc.days} วัน): +${calc.interest.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ฿`,
+                    `• ยอดรวมสุทธิ: ${calc.total.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ฿`
+                );
+            }
+
+            if (mode === 'payments' || mode === 'both') {
+                lines.push(`--------------------------`, `📜 ประวัติการจ่ายเงิน`);
+                if (!loan.history || loan.history.length === 0) {
+                    lines.push(`• ยังไม่มีประวัติการจ่ายเงิน`);
+                } else {
+                    const sortedHist = [...loan.history].sort((a, b) => new Date(a.date) - new Date(b.date));
+                    let totalPaid = 0;
+                    sortedHist.forEach((h, idx) => {
+                        const hDate = new Date(h.date).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+                        const label = h.type === 'interest' ? 'จ่ายดอก' : 'จ่ายลดต้น';
+                        totalPaid += h.amount;
+                        lines.push(`${idx + 1}. ${hDate} น. | ${label} ${h.amount.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ฿${h.note ? ' (' + h.note + ')' : ''}`);
+                    });
+                    lines.push(`• รวมจ่ายแล้วทั้งหมด: ${totalPaid.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ฿`);
+                }
+            }
+
+            return lines.join('\n');
+        }
+
+        function updateSharePreview() {
+            const loan = loans.find(l => l.id === sharingLoanId);
+            if (!loan) return;
+            document.getElementById('sharePreviewText').value = buildCustomerShareText(loan, currentShareMode);
+        }
+
+        function copyShareText() {
+            const text = document.getElementById('sharePreviewText').value;
+            if (!text.trim()) return;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('คัดลอกข้อความเรียบร้อยแล้วครับ');
+            }).catch(() => {
+                alert('ไม่สามารถคัดลอกอัตโนมัติได้ สามารถกดเลือกข้อความในกล่องแล้วคัดลอกได้เลยครับ');
+            });
+        }
+
+        function sendShareText() {
+            const text = document.getElementById('sharePreviewText').value;
+            if (!text.trim()) return;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'รายละเอียดบัญชีเงินกู้',
+                    text: text
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('คัดลอกข้อความเรียบร้อยแล้ว สามารถนำไปวางส่งให้ลูกค้าได้เลยครับ!');
+                });
+            }
+        }
 
         function openSimulatorModal() {
             calculateSimulation();
@@ -620,14 +771,42 @@
         function calculateLoanDetails(loan) {
             const startDate = new Date(loan.loanDateTime);
             const endDate = loan.status === 'paid' && loan.paidDate ? new Date(loan.paidDate) : new Date();
-            const diffMs = Math.max(0, endDate - startDate);
-            const fullDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const totalDiffMs = Math.max(0, endDate - startDate);
+            const fullDays = Math.floor(totalDiffMs / (1000 * 60 * 60 * 24));
 
+            const principalPayments = (loan.history || [])
+                .filter(h => h.type === 'principal')
+                .map(h => ({ date: new Date(h.date), amount: h.amount }))
+                .sort((a, b) => a.date - b.date);
+
+            const totalPrincipalPaid = principalPayments.reduce((sum, p) => sum + p.amount, 0);
+            let runningPrincipal = loan.principal + totalPrincipalPaid;
+
+            let cursorDate = startDate;
             let totalInterestCalculated = 0;
-            if (loan.interestType === 'daily') {
-                totalInterestCalculated = loan.principal * (loan.interestRate / 100) * fullDays;
-            } else if (loan.interestType === 'monthly') {
-                totalInterestCalculated = loan.principal * (loan.interestRate / 100) * (fullDays / 30);
+
+            const calcPeriodInterest = (principalAmt, fromDt, toDt) => {
+                if (loan.interestType === 'none' || loan.interestRate <= 0) return 0;
+                const ms = Math.max(0, toDt - fromDt);
+                const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+                if (loan.interestType === 'daily') {
+                    return principalAmt * (loan.interestRate / 100) * days;
+                } else if (loan.interestType === 'monthly') {
+                    return principalAmt * (loan.interestRate / 100) * (days / 30);
+                }
+                return 0;
+            };
+
+            for (const pay of principalPayments) {
+                if (pay.date > cursorDate && pay.date <= endDate) {
+                    totalInterestCalculated += calcPeriodInterest(runningPrincipal, cursorDate, pay.date);
+                    cursorDate = pay.date;
+                }
+                runningPrincipal = Math.max(0, runningPrincipal - pay.amount);
+            }
+
+            if (endDate > cursorDate) {
+                totalInterestCalculated += calcPeriodInterest(runningPrincipal, cursorDate, endDate);
             }
 
             let paidInterestSum = 0;
@@ -722,9 +901,10 @@
 
                     ${historyHtml}
 
-                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center">
-                        <div class="text-[11px] text-slate-400">🕒 กู้: ${dateFormatted} น.</div>
+                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center gap-2">
+                        <div class="text-[11px] text-slate-400 shrink-0">🕒 กู้: ${dateFormatted} น.</div>
                         <div class="flex gap-1.5 flex-wrap justify-end">
+                            <button onclick="openShareCustomerModal(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-indigo-50 text-indigo-700 active:bg-indigo-100 font-medium">📤 ส่งยอด</button>
                             ${loan.status === 'unpaid' ? `<button onclick="openPaymentModal(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-emerald-50 text-emerald-700 active:bg-emerald-100 font-medium">💰 จ่ายเงิน</button>` : ''}
                             <button onclick="openModal(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-sky-50 text-sky-600 active:bg-sky-100 font-medium">✏️ แก้ไข</button>
                             <button onclick="deleteLoan(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-red-50 text-red-600 active:bg-red-100 font-medium">ลบ</button>
