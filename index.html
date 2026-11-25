@@ -3,180 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1d4ed8">
+    <meta name="theme-color" content="#3b82f6">
     <title>สมุดบัญชีเงินกู้</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Prompt', sans-serif; 
-            background-color: #f1f5f9;
+        body {
+            font-family: 'Prompt', sans-serif;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(147, 197, 253, 0.35), transparent 45%),
+                linear-gradient(180deg, #93c5fd 0%, #bfdbfe 35%, #dbeafe 100%);
+            min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
         }
-        input, select { font-size: 16px !important; }
+        input, select, textarea { font-size: 16px !important; }
+
+        /* สไตล์กรอบหน้าต่างสไตล์เกมมีขอบหนาและหมุด 4 มุม */
+        .game-panel {
+            position: relative;
+            background: linear-gradient(180deg, #a5c4f8 0%, #86aee9 100%);
+            border: 3px solid #2c3e68;
+            border-radius: 18px;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.65),
+                inset 0 -3px 0 rgba(36, 56, 102, 0.45),
+                0 6px 0 #1e2d4d,
+                0 10px 18px rgba(15, 23, 42, 0.25);
+        }
+        .game-panel::before,
+        .game-panel::after {
+            content: "";
+            position: absolute;
+            top: 7px;
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            border: 1.5px solid #334155;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.9);
+            pointer-events: none;
+        }
+        .game-panel::before { left: 7px; }
+        .game-panel::after { right: 7px; }
+
+        /* แท็บด้านบนสไตล์ปุ่มเกม */
+        .game-tab {
+            border: 2.5px solid #25365c;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: transform 0.08s ease;
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.45), 0 3px 0 #1e293b;
+        }
+        .game-tab:active {
+            transform: translateY(2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 0 #1e293b;
+        }
+        .game-tab-active {
+            background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 100%);
+            color: #ffffff;
+            text-shadow: 0 1.5px 0 #1e3a8a, -1px -1px 0 #1e3a8a, 1px -1px 0 #1e3a8a, -1px 1px 0 #1e3a8a, 1px 1px 0 #1e3a8a;
+        }
+        .game-tab-inactive {
+            background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%);
+            color: #1e293b;
+        }
+
+        /* การ์ดลูกหนี้สไตล์ไอเทมการ์ด */
+        .game-card {
+            background: linear-gradient(180deg, #f8f3e6 0%, #efe6d0 100%);
+            border: 2.5px solid #57432c;
+            border-radius: 14px;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.85),
+                0 4px 0 #3b2d1d,
+                0 6px 10px rgba(0,0,0,0.16);
+        }
+
+        /* ป้ายชื่อด้านบนการ์ด */
+        .game-nameplate {
+            border: 2px solid #2c2116;
+            border-radius: 9px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 1.5px 0 #1e150c, -1px 0 0 #1e150c, 1px 0 0 #1e150c, 0 -1px 0 #1e150c, 0 1px 0 #1e150c;
+            box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.45), 0 2px 0 #2c2116;
+        }
+
+        /* ปุ่มสีเหลืองทองสไตล์ปุ่มราคา/ยืนยันในเกม */
+        .game-btn-gold {
+            background: linear-gradient(180deg, #fde047 0%, #eab308 100%);
+            border: 2px solid #452700;
+            border-radius: 9px;
+            color: #291700;
+            font-weight: 800;
+            box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.65), 0 2.5px 0 #3b2100;
+        }
+        .game-btn-gold:active {
+            transform: translateY(1.5px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 0 #3b2100;
+        }
+
+        /* ปุ่มย้อนกลับมุมซ้ายล่างสไตล์เกม */
+        .game-back-btn {
+            background: linear-gradient(180deg, #fb7185 0%, #e11d48 100%);
+            border: 3px solid #3b0a18;
+            border-radius: 14px;
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 4px 0 #2b0611;
+        }
+        .game-back-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #2b0611;
+        }
     </style>
 </head>
 <body class="text-slate-800 pb-28">
 
-    <!-- Top App Bar & Summary -->
-    <div class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white pt-5 pb-5 px-4 rounded-b-3xl shadow-lg sticky top-0 z-20">
-        <div class="flex justify-between items-center mb-3">
+    <!-- Top Game Tabs Bar -->
+    <div class="sticky top-0 z-20 px-2.5 pt-2.5 pb-2 bg-[#7da7e6]/95 backdrop-blur-xs border-b-2 border-[#25365c] shadow-md">
+        <div class="grid grid-cols-4 gap-1.5 max-w-2xl mx-auto">
+            <button onclick="switchMainTab('loans'); setFilter('unpaid');" id="mTab-loans"
+                class="game-tab game-tab-active py-2 px-1 text-[11px] sm:text-xs truncate">
+                📋 ลูกหนี้ค้าง
+            </button>
+            <button onclick="switchMainTab('loans'); setFilter('due');" id="mTab-due"
+                class="game-tab game-tab-inactive py-2 px-1 text-[11px] sm:text-xs truncate">
+                ⏰ ใกล้/เลยกำหนด
+            </button>
+            <button onclick="switchMainTab('report');" id="mTab-report"
+                class="game-tab game-tab-inactive py-2 px-1 text-[11px] sm:text-xs truncate">
+                📊 สรุปเงินเข้า
+            </button>
+            <button onclick="openSimulatorModal();" id="mTab-sim"
+                class="game-tab game-tab-inactive py-2 px-1 text-[11px] sm:text-xs truncate">
+                🧮 คำนวณดอก
+            </button>
+        </div>
+
+        <!-- Summary Strip -->
+        <div class="max-w-2xl mx-auto mt-2 bg-[#e8eef9] border-2 border-[#2c3e68] rounded-xl px-3 py-2 flex flex-wrap items-center justify-between gap-2 shadow-inner">
             <div>
-                <h1 class="text-xl font-bold tracking-tight">📒 บัญชีลูกหนี้ PRO</h1>
-                <p class="text-blue-200 text-xs">ระบบจัดการเงินกู้และหักลดต้นอัตโนมัติ</p>
+                <div class="text-[10px] font-bold text-slate-600">ยอดสุทธิที่ต้องได้รับคืน (ยังไม่ปิดยอด)</div>
+                <div class="text-xl sm:text-2xl font-extrabold text-emerald-700 leading-tight" id="sumTotal">0.00 ฿</div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="openSimulatorModal()" class="bg-white/20 active:bg-white/30 text-xs px-2.5 py-1.5 rounded-full backdrop-blur-sm border border-white/20 font-medium">
-                    🧮 คำนวณ
-                </button>
-                <button onclick="exportData()" class="bg-white/15 active:bg-white/25 text-xs px-2.5 py-1.5 rounded-full backdrop-blur-sm border border-white/20">
-                    📥 สำรอง
-                </button>
+            <div class="flex gap-3 text-[11px] font-bold">
+                <div class="bg-white/80 border border-slate-300 rounded-lg px-2.5 py-1">
+                    <span class="text-slate-500 block text-[10px]">เงินต้นคงเหลือ</span>
+                    <span class="text-slate-800" id="sumPrincipal">0.00 ฿</span>
+                </div>
+                <div class="bg-amber-50 border border-amber-300 rounded-lg px-2.5 py-1">
+                    <span class="text-amber-700 block text-[10px]">ดอกเบี้ยสะสม</span>
+                    <span class="text-amber-700" id="sumInterest">0.00 ฿</span>
+                </div>
             </div>
-        </div>
-
-        <!-- Summary Cards -->
-        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/15">
-            <div class="text-blue-100 text-xs">ยอดสุทธิที่ต้องได้รับคืน (ยังไม่ปิดยอด)</div>
-            <div class="text-3xl font-bold text-emerald-300 my-1" id="sumTotal">0.00 ฿</div>
-            <div class="grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-white/15 text-xs">
-                <div>
-                    <span class="text-blue-200 block">เงินต้นคงเหลือรวม</span>
-                    <span class="font-semibold text-base" id="sumPrincipal">0.00 ฿</span>
-                </div>
-                <div>
-                    <span class="text-blue-200 block">ดอกเบี้ยสะสมรวม</span>
-                    <span class="font-semibold text-base text-amber-300" id="sumInterest">0.00 ฿</span>
-                </div>
+            <div class="flex gap-1 w-full sm:w-auto justify-end">
+                <button onclick="requestNotificationPermission()" id="notifBtn"
+                    class="game-btn-gold text-[11px] px-2.5 py-1">🔔 เตือน</button>
+                <button onclick="exportData()"
+                    class="bg-white border-2 border-[#2c3e68] rounded-lg text-[11px] font-bold px-2.5 py-1 text-slate-700">📥 สำรอง</button>
+                <button onclick="openModal()"
+                    class="game-btn-gold text-[11px] px-3 py-1">+ เพิ่มลูกหนี้</button>
             </div>
         </div>
     </div>
 
-    <!-- Main Navigation Tabs -->
-    <div class="px-4 mt-3 flex bg-white rounded-2xl mx-4 p-1 shadow-sm border border-slate-100">
-        <button onclick="switchMainTab('loans')" id="mTab-loans" class="flex-1 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white transition">
-            📋 รายชื่อลูกหนี้
-        </button>
-        <button onclick="switchMainTab('report')" id="mTab-report" class="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-600 transition">
-            📊 สรุปยอดเงินเข้า
-        </button>
+    <!-- 🚨 DUE DATE ALERT BANNER -->
+    <div id="dueAlertBanner" class="px-3 mt-2.5 max-w-2xl mx-auto hidden">
+        <div class="bg-rose-50 border-2 border-rose-700 rounded-2xl p-3 shadow-md">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="font-extrabold text-rose-700 text-xs">⏰ แจ้งเตือนกำหนดชำระหนี้</span>
+                <button onclick="switchMainTab('loans'); setFilter('due');" class="text-[11px] font-bold text-rose-600 underline">ดูเฉพาะรายการที่ถึงกำหนด</button>
+            </div>
+            <div id="dueAlertList" class="space-y-1 text-xs text-slate-700"></div>
+        </div>
     </div>
 
-    <!-- 📋 VIEW 1: LOANS LIST -->
-    <div id="view-loans" class="px-4 mt-3 space-y-2.5">
-        <input type="text" id="searchInput" onkeyup="renderLoans()" placeholder="🔍 ค้นหาชื่อผู้กู้ หรือเบอร์โทร..."
-            class="w-full bg-white rounded-xl border border-slate-200 px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        
-        <div class="flex gap-2">
-            <button onclick="setFilter('unpaid')" id="tab-unpaid" class="flex-1 py-2 rounded-xl text-xs font-medium bg-blue-600 text-white shadow-sm transition">
-                ยังไม่ชำระ
-            </button>
-            <button onclick="setFilter('paid')" id="tab-paid" class="flex-1 py-2 rounded-xl text-xs font-medium bg-white text-slate-600 border border-slate-200 transition">
-                ชำระแล้ว
-            </button>
-            <button onclick="setFilter('all')" id="tab-all" class="flex-1 py-2 rounded-xl text-xs font-medium bg-white text-slate-600 border border-slate-200 transition">
-                ทั้งหมด
-            </button>
-        </div>
+    <!-- 📋 VIEW 1: LOANS LIST (กรอบหลักสไตล์เกม + การ์ด 3 คอลัมน์) -->
+    <div id="view-loans" class="px-3 mt-2.5 max-w-2xl mx-auto">
+        <div class="game-panel p-3 sm:p-4">
+            <div class="flex flex-col sm:flex-row gap-2 mb-3">
+                <input type="text" id="searchInput" onkeyup="renderLoans()" placeholder="🔍 ค้นหาชื่อผู้กู้ หรือเบอร์โทร..."
+                    class="flex-1 bg-[#f8f3e6] rounded-xl border-2 border-[#57432c] px-3.5 py-2 text-xs font-medium focus:outline-none">
+                <div class="flex gap-1">
+                    <button onclick="setFilter('unpaid')" id="tab-unpaid"
+                        class="flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-blue-600 text-white">ยังไม่ชำระ</button>
+                    <button onclick="setFilter('due')" id="tab-due"
+                        class="flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-rose-700 bg-white text-rose-700">ใกล้/เลย</button>
+                    <button onclick="setFilter('paid')" id="tab-paid"
+                        class="flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-white text-slate-700">ชำระแล้ว</button>
+                    <button onclick="setFilter('all')" id="tab-all"
+                        class="flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-white text-slate-700">ทั้งหมด</button>
+                </div>
+            </div>
 
-        <div id="loanList" class="space-y-3 mt-3"></div>
+            <!-- ตารางการ์ดลูกหนี้ 3 คอลัมน์ -->
+            <div id="loanList" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
 
-        <div id="emptyState" class="text-center py-12 px-4 hidden">
-            <div class="text-4xl mb-2">📭</div>
-            <div class="text-slate-500 font-medium">ไม่มีรายการในหมวดหมู่นี้</div>
-            <div class="text-slate-400 text-xs mt-1">กดปุ่ม "+ เพิ่มรายการกู้ยืมใหม่" ด้านล่างเพื่อเริ่มบันทึก</div>
+            <div id="emptyState" class="text-center py-10 px-4 hidden bg-[#f8f3e6]/80 rounded-xl border-2 border-dashed border-[#57432c]/50">
+                <div class="text-4xl mb-2">📭</div>
+                <div class="text-slate-700 font-bold text-sm">ไม่มีรายการในหมวดหมู่นี้</div>
+                <div class="text-slate-500 text-xs mt-1">กดปุ่ม "+ เพิ่มลูกหนี้" ด้านบนเพื่อเริ่มบันทึก</div>
+            </div>
         </div>
     </div>
 
     <!-- 📊 VIEW 2: REPORT SUMMARY -->
-    <div id="view-report" class="px-4 mt-3 space-y-3 hidden">
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <h2 class="font-bold text-slate-800 text-sm mb-3">📅 ตัวกรองรายงานตามช่วงเวลา</h2>
+    <div id="view-report" class="px-3 mt-2.5 max-w-2xl mx-auto space-y-3 hidden">
+        <div class="game-panel p-4">
+            <h2 class="font-extrabold text-slate-900 text-sm mb-2.5">📅 ตัวกรองรายงานตามช่วงเวลา</h2>
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="block text-[11px] text-slate-500 mb-1">ตั้งแต่วันที่</label>
-                    <input type="date" id="reportStart" onchange="renderReport()" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-slate-50">
+                    <label class="block text-[11px] font-bold text-slate-800 mb-1">ตั้งแต่วันที่</label>
+                    <input type="date" id="reportStart" onchange="renderReport()" class="w-full rounded-xl border-2 border-[#57432c] px-3 py-2 text-xs bg-[#f8f3e6]">
                 </div>
                 <div>
-                    <label class="block text-[11px] text-slate-500 mb-1">ถึงวันที่</label>
-                    <input type="date" id="reportEnd" onchange="renderReport()" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-slate-50">
+                    <label class="block text-[11px] font-bold text-slate-800 mb-1">ถึงวันที่</label>
+                    <input type="date" id="reportEnd" onchange="renderReport()" class="w-full rounded-xl border-2 border-[#57432c] px-3 py-2 text-xs bg-[#f8f3e6]">
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                <div class="text-xs text-slate-400">💵 รับชำระดอกเบี้ย</div>
-                <div class="text-xl font-bold text-amber-600 mt-1" id="repInterest">0.00 ฿</div>
+        <div class="grid grid-cols-2 gap-2.5">
+            <div class="game-card p-3.5">
+                <div class="text-xs font-bold text-amber-800">💵 รับชำระดอกเบี้ย</div>
+                <div class="text-xl font-extrabold text-amber-600 mt-1" id="repInterest">0.00 ฿</div>
             </div>
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                <div class="text-xs text-slate-400">📉 รับชำระลดต้น</div>
-                <div class="text-xl font-bold text-blue-600 mt-1" id="repPrincipal">0.00 ฿</div>
+            <div class="game-card p-3.5">
+                <div class="text-xs font-bold text-blue-800">📉 รับชำระลดต้น</div>
+                <div class="text-xl font-extrabold text-blue-700 mt-1" id="repPrincipal">0.00 ฿</div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-4 shadow-md flex justify-between items-center">
+        <div class="game-card p-4 flex justify-between items-center bg-gradient-to-r from-emerald-100 to-teal-100">
             <div>
-                <div class="text-emerald-100 text-xs">💰 ยอดเงินรับรวมทั้งหมดในช่วงเวลานี้</div>
-                <div class="text-2xl font-bold mt-1" id="repTotal">0.00 ฿</div>
+                <div class="text-emerald-900 text-xs font-bold">💰 ยอดเงินรับรวมทั้งหมดในช่วงเวลานี้</div>
+                <div class="text-2xl font-extrabold text-emerald-700 mt-0.5" id="repTotal">0.00 ฿</div>
             </div>
-            <button onclick="shareReport()" class="bg-white text-emerald-800 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow active:scale-95 transition flex items-center gap-1">
+            <button onclick="shareReport()" class="game-btn-gold text-xs font-bold px-3.5 py-2.5">
                 📤 แชร์รายงาน
             </button>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <h3 class="font-bold text-slate-800 text-sm mb-2">📜 ประวัติการรับเงินเข้าทั้งหมด</h3>
-            <div id="reportHistoryList" class="space-y-2 text-xs text-slate-600"></div>
+        <div class="game-panel p-4">
+            <h3 class="font-extrabold text-slate-900 text-sm mb-2">📜 ประวัติการรับเงินเข้าทั้งหมด</h3>
+            <div id="reportHistoryList" class="space-y-2 text-xs text-slate-700"></div>
         </div>
     </div>
 
-    <!-- Floating Action Button (Add New) -->
-    <div class="fixed bottom-5 right-4 left-4 z-30 flex justify-center">
-        <button onclick="openModal()" class="w-full max-w-md bg-blue-600 active:bg-blue-700 text-white font-semibold py-3.5 px-6 rounded-2xl shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 text-base">
-            <span class="text-xl leading-none">+</span> เพิ่มรายการกู้ยืมใหม่
+    <!-- ปุ่มย้อนกลับ/ไปหน้ารายชื่อมุมซ้ายล่างสไตล์เกม -->
+    <div class="fixed bottom-4 left-4 z-30">
+        <button onclick="switchMainTab('loans')" title="กลับหน้ารายชื่อลูกหนี้"
+            class="game-back-btn w-13 h-12 px-3.5 flex items-center justify-center text-white font-extrabold text-xl">
+            ↩
         </button>
     </div>
 
+    <!-- Modal รายละเอียดลูกหนี้ & ประวัติการจ่าย -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center p-2 sm:p-4">
+        <div class="game-panel w-full max-w-md p-4 sm:p-5 max-h-[88vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-2.5 mb-3 border-b-2 border-[#2c3e68]/30">
+                <h2 class="text-base font-extrabold text-slate-900" id="detailTitle">รายละเอียดลูกหนี้</h2>
+                <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-rose-600 text-white border-2 border-[#2c3e68] font-bold text-sm">✕</button>
+            </div>
+            <div id="detailBody" class="space-y-3 text-xs"></div>
+        </div>
+    </div>
+
     <!-- Modal เพิ่ม/แก้ไข ข้อมูลหลัก -->
-    <div id="addModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center pb-3 mb-4 border-b border-slate-100">
-                <h2 class="text-lg font-bold text-slate-800" id="modalTitle">➕ เพิ่มข้อมูลคนกู้เงิน</h2>
-                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-lg">✕</button>
+    <div id="addModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center p-2 sm:p-4">
+        <div class="game-panel w-full max-w-md p-4 sm:p-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-2.5 mb-3 border-b-2 border-[#2c3e68]/30">
+                <h2 class="text-base font-extrabold text-slate-900" id="modalTitle">➕ เพิ่มข้อมูลคนกู้เงิน</h2>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-rose-600 text-white border-2 border-[#2c3e68] font-bold text-sm">✕</button>
             </div>
 
-            <form id="loanForm" class="space-y-3.5">
+            <form id="loanForm" class="space-y-3">
                 <input type="hidden" id="editId">
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">รูปถ่ายผู้กู้ / บัตรประชาชน (ถ้ามี)</label>
-                    <input type="file" id="borrowerImage" accept="image/*"
-                        class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+
+                <div class="bg-[#f8f3e6] p-3 rounded-xl border-2 border-[#57432c]">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-800">รูปถ่ายผู้กู้ / บัตรประชาชน (ถ้ามี)</label>
+                        <button type="button" id="removeBorrowerImgBtn" onclick="clearBorrowerImage()" class="hidden text-[11px] text-rose-600 font-bold">✕ ลบรูป</button>
+                    </div>
+                    <input type="file" id="borrowerImage" accept="image/*" onchange="handleImageUpload(this, 'borrower')"
+                        class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-2 file:border-[#57432c] file:text-xs file:font-bold file:bg-amber-300 file:text-slate-900">
+                    <div id="borrowerPreviewBox" class="mt-2 hidden">
+                        <img id="borrowerPreviewImg" class="w-20 h-20 rounded-xl object-cover border-2 border-[#57432c]">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อ-นามสกุล ผู้กู้ *</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">ชื่อ-นามสกุล ผู้กู้ *</label>
                     <input type="text" id="borrowerName" required placeholder="ระบุชื่อผู้กู้"
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">เบอร์โทร / หมายเหตุ</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">เบอร์โทร / หมายเหตุ</label>
                     <input type="text" id="borrowerNote" placeholder="เช่น 081-234-5678"
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">เงินต้น (บาท) *</label>
+                        <label class="block text-xs font-bold text-slate-900 mb-1">เงินต้น (บาท) *</label>
                         <input type="number" inputmode="decimal" id="principal" required min="1" step="0.01" placeholder="0.00"
-                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">รูปแบบดอกเบี้ย *</label>
+                        <label class="block text-xs font-bold text-slate-900 mb-1">รูปแบบดอกเบี้ย *</label>
                         <select id="interestType" onchange="toggleInterestRate()"
-                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3 py-2 focus:outline-none">
                             <option value="none">ไม่คิดดอกเบี้ย</option>
                             <option value="daily">รายวัน (%)</option>
                             <option value="monthly">รายเดือน (%)</option>
@@ -184,21 +321,34 @@
                     </div>
                 </div>
 
-                <div id="rateContainer" class="hidden bg-amber-50 p-3 rounded-xl border border-amber-200">
-                    <label class="block text-xs font-medium text-amber-800 mb-1" id="rateLabel">อัตราดอกเบี้ย (%)</label>
+                <div id="rateContainer" class="hidden bg-amber-100 p-3 rounded-xl border-2 border-[#57432c]">
+                    <label class="block text-xs font-bold text-amber-950 mb-1" id="rateLabel">อัตราดอกเบี้ย (%)</label>
                     <input type="number" inputmode="decimal" id="interestRate" min="0" step="0.01" value="0"
-                        class="w-full rounded-xl border border-amber-300 bg-white px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-white px-3.5 py-1.5 focus:outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">วันและเวลาที่กู้ *</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">วันและเวลาที่กู้ *</label>
                     <input type="datetime-local" id="loanDateTime" required
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                 </div>
 
-                <div class="pt-2">
+                <div class="bg-rose-100/90 p-3 rounded-xl border-2 border-rose-800">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-rose-950">⏰ วันและเวลาครบกำหนดชำระ</label>
+                        <div class="flex gap-1">
+                            <button type="button" onclick="setQuickDueDate(7)" class="text-[10px] font-bold bg-white border border-rose-800 text-rose-800 px-1.5 py-0.5 rounded">+7 วัน</button>
+                            <button type="button" onclick="setQuickDueDate(30)" class="text-[10px] font-bold bg-white border border-rose-800 text-rose-800 px-1.5 py-0.5 rounded">+30 วัน</button>
+                        </div>
+                    </div>
+                    <input type="datetime-local" id="dueDateTime"
+                        class="w-full rounded-xl border-2 border-rose-800 bg-white px-3.5 py-1.5 focus:outline-none">
+                    <p class="text-[10px] text-rose-900 mt-1 font-medium">* เว้นว่างได้หากไม่มีกำหนดคืนแน่นอน ระบบจะเตือนล่วงหน้า 3 วัน</p>
+                </div>
+
+                <div class="pt-1">
                     <button type="submit" id="saveButtonText"
-                        class="w-full bg-blue-600 active:bg-blue-700 text-white font-semibold py-3.5 rounded-xl shadow-md">
+                        class="game-btn-gold w-full py-3 text-sm">
                         บันทึกข้อมูล
                     </button>
                 </div>
@@ -207,50 +357,61 @@
     </div>
 
     <!-- Modal จ่ายดอก / จ่ายต้น -->
-    <div id="paymentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center pb-3 mb-4 border-b border-slate-100">
-                <h2 class="text-lg font-bold text-slate-800">💰 บันทึกการรับชำระเงิน</h2>
-                <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-lg">✕</button>
+    <div id="paymentModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center p-2 sm:p-4">
+        <div class="game-panel w-full max-w-md p-4 sm:p-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-2.5 mb-3 border-b-2 border-[#2c3e68]/30">
+                <h2 class="text-base font-extrabold text-slate-900">💰 บันทึกการรับชำระเงิน</h2>
+                <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-rose-600 text-white border-2 border-[#2c3e68] font-bold text-sm">✕</button>
             </div>
 
-            <form id="paymentForm" class="space-y-3.5">
+            <form id="paymentForm" class="space-y-3">
                 <input type="hidden" id="payLoanId">
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">ประเภทการชำระ *</label>
-                    <select id="payType" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-bold text-slate-900 mb-1">ประเภทการชำระ *</label>
+                    <select id="payType" class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3 py-2 focus:outline-none">
                         <option value="interest">จ่ายดอกเบี้ย (ถ้าเกินจะหักลดต้นให้อัตโนมัติ)</option>
                         <option value="principal">จ่ายลดเงินต้นโดยตรง</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">จำนวนเงิน (บาท) *</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">จำนวนเงิน (บาท) *</label>
                     <input type="number" inputmode="decimal" id="payAmount" required min="0.01" step="0.01" placeholder="0.00"
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">วันและเวลาที่จ่าย *</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">วันและเวลาที่จ่าย *</label>
                     <input type="datetime-local" id="payDateTime" required
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
+                </div>
+
+                <div class="bg-[#e8eef9] p-3 rounded-xl border-2 border-[#2c3e68]">
+                    <label class="block text-xs font-bold text-slate-900 mb-1">📅 อัปเดตวันครบกำหนดชำระรอบถัดไป (ถ้ามี)</label>
+                    <input type="datetime-local" id="nextDueDateTime"
+                        class="w-full rounded-xl border-2 border-[#2c3e68] bg-white px-3.5 py-1.5 focus:outline-none">
+                </div>
+
+                <div class="bg-[#f8f3e6] p-3 rounded-xl border-2 border-[#57432c]">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-800">รูปสลิปโอนเงิน (ถ้ามี)</label>
+                        <button type="button" id="removeSlipImgBtn" onclick="clearSlipImage()" class="hidden text-[11px] text-rose-600 font-bold">✕ ลบรูป</button>
+                    </div>
+                    <input type="file" id="paySlip" accept="image/*" onchange="handleImageUpload(this, 'slip')"
+                        class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-2 file:border-[#57432c] file:text-xs file:font-bold file:bg-amber-300 file:text-slate-900">
+                    <div id="slipPreviewBox" class="mt-2 hidden">
+                        <img id="slipPreviewImg" class="w-24 h-24 rounded-xl object-cover border-2 border-[#57432c]">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">รูปสลิปโอนเงิน (ถ้ามี)</label>
-                    <input type="file" id="paySlip" accept="image/*"
-                        class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">หมายเหตุ</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">หมายเหตุ</label>
                     <input type="text" id="payNote" placeholder="เช่น โอนผ่านไทยพาณิชย์"
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                 </div>
 
-                <div class="pt-2">
-                    <button type="submit"
-                        class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl shadow-md">
+                <div class="pt-1">
+                    <button type="submit" class="game-btn-gold w-full py-3 text-sm">
                         ยืนยันการรับเงิน
                     </button>
                 </div>
@@ -259,101 +420,87 @@
     </div>
 
     <!-- Modal เลือกส่งข้อมูลให้ลูกค้า -->
-    <div id="shareCustomerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center pb-3 mb-3 border-b border-slate-100">
+    <div id="shareCustomerModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center p-2 sm:p-4">
+        <div class="game-panel w-full max-w-md p-4 sm:p-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-2.5 mb-3 border-b-2 border-[#2c3e68]/30">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800">📤 ส่งข้อมูลให้ลูกค้า</h2>
-                    <p class="text-xs text-slate-400" id="shareBorrowerSubtitle">ผู้กู้: -</p>
+                    <h2 class="text-base font-extrabold text-slate-900">📤 ส่งข้อมูลให้ลูกค้า</h2>
+                    <p class="text-xs font-semibold text-slate-700" id="shareBorrowerSubtitle">ผู้กู้: -</p>
                 </div>
-                <button onclick="closeShareCustomerModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-lg">✕</button>
+                <button onclick="closeShareCustomerModal()" class="w-8 h-8 rounded-full bg-rose-600 text-white border-2 border-[#2c3e68] font-bold text-sm">✕</button>
             </div>
 
-            <div class="space-y-2.5 mb-3">
-                <div class="text-xs font-semibold text-slate-600">เลือกรูปแบบข้อมูลที่ต้องการส่ง:</div>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" onclick="selectShareMode('balance')" id="shareMode-balance"
-                        class="py-2.5 px-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-sm transition text-center">
-                        💵 ยอดคงเหลือ
-                    </button>
-                    <button type="button" onclick="selectShareMode('payments')" id="shareMode-payments"
-                        class="py-2.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 transition text-center">
-                        📜 การจ่ายเงิน
-                    </button>
-                    <button type="button" onclick="selectShareMode('both')" id="shareMode-both"
-                        class="py-2.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 transition text-center">
-                        📦 ส่งทั้ง 2 อย่าง
-                    </button>
-                </div>
+            <div class="grid grid-cols-3 gap-1.5 mb-3">
+                <button type="button" onclick="selectShareMode('balance')" id="shareMode-balance"
+                    class="py-2 px-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-blue-600 text-white">💵 ยอดคงเหลือ</button>
+                <button type="button" onclick="selectShareMode('payments')" id="shareMode-payments"
+                    class="py-2 px-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-[#f8f3e6] text-slate-800">📜 การจ่ายเงิน</button>
+                <button type="button" onclick="selectShareMode('both')" id="shareMode-both"
+                    class="py-2 px-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-[#f8f3e6] text-slate-800">📦 ทั้ง 2 อย่าง</button>
             </div>
 
-            <div class="mb-3.5">
-                <label class="block text-xs font-medium text-slate-600 mb-1">ตัวอย่างข้อความที่จะส่ง (แก้ไขเพิ่มเติมได้)</label>
+            <div class="mb-3">
                 <textarea id="sharePreviewText" rows="8"
-                    class="w-full rounded-xl border border-slate-300 p-3 text-xs leading-relaxed bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    class="w-full rounded-xl border-2 border-[#57432c] p-3 text-xs leading-relaxed bg-[#f8f3e6] focus:outline-none"></textarea>
             </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
+            <div class="grid grid-cols-2 gap-2">
                 <button type="button" onclick="copyShareText()"
-                    class="w-full bg-slate-100 active:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-xs border border-slate-200">
-                    📋 คัดลอกข้อความ
-                </button>
+                    class="bg-white border-2 border-[#2c3e68] rounded-xl text-slate-800 font-bold py-2.5 text-xs">📋 คัดลอกข้อความ</button>
                 <button type="button" onclick="sendShareText()"
-                    class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs shadow-md">
-                    🚀 แชร์ / ส่งให้ลูกค้า
-                </button>
+                    class="game-btn-gold py-2.5 text-xs">🚀 แชร์ / ส่งให้ลูกค้า</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal คำนวณเงินกู้ล่วงหน้า (Simulator) -->
-    <div id="simulatorModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center pb-3 mb-4 border-b border-slate-100">
-                <h2 class="text-lg font-bold text-slate-800">🧮 คำนวณเงินกู้ล่วงหน้า</h2>
-                <button onclick="closeSimulatorModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-lg">✕</button>
+    <!-- Modal คำนวณเงินกู้ล่วงหน้า -->
+    <div id="simulatorModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-40 hidden flex items-end sm:items-center justify-center p-2 sm:p-4">
+        <div class="game-panel w-full max-w-md p-4 sm:p-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-2.5 mb-3 border-b-2 border-[#2c3e68]/30">
+                <h2 class="text-base font-extrabold text-slate-900">🧮 คำนวณเงินกู้ล่วงหน้า</h2>
+                <button onclick="closeSimulatorModal()" class="w-8 h-8 rounded-full bg-rose-600 text-white border-2 border-[#2c3e68] font-bold text-sm">✕</button>
             </div>
 
-            <div class="space-y-3.5">
+            <div class="space-y-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">จำนวนเงินต้นจำลอง (บาท)</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">จำนวนเงินต้นจำลอง (บาท)</label>
                     <input type="number" id="simPrincipal" value="10000" oninput="calculateSimulation()"
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">รูปแบบดอกเบี้ย</label>
+                        <label class="block text-xs font-bold text-slate-900 mb-1">รูปแบบดอกเบี้ย</label>
                         <select id="simType" onchange="calculateSimulation()"
-                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3 py-2 focus:outline-none">
                             <option value="daily">รายวัน (%)</option>
                             <option value="monthly">รายเดือน (%)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">อัตราดอกเบี้ย (%)</label>
+                        <label class="block text-xs font-bold text-slate-900 mb-1">อัตราดอกเบี้ย (%)</label>
                         <input type="number" id="simRate" value="1" step="0.1" oninput="calculateSimulation()"
-                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">ระยะเวลาที่ต้องการคำนวณ (วัน)</label>
+                    <label class="block text-xs font-bold text-slate-900 mb-1">ระยะเวลาที่ต้องการคำนวณ (วัน)</label>
                     <input type="number" id="simDays" value="30" oninput="calculateSimulation()"
-                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="w-full rounded-xl border-2 border-[#57432c] bg-[#f8f3e6] px-3.5 py-2 focus:outline-none">
                 </div>
 
-                <div class="bg-blue-50 rounded-2xl p-4 border border-blue-100 space-y-2 text-xs">
+                <div class="game-card p-3.5 space-y-1.5 text-xs">
                     <div class="flex justify-between">
-                        <span class="text-slate-500">เงินต้นจำลอง:</span>
-                        <span class="font-semibold text-slate-700" id="simResPrincipal">0.00 ฿</span>
+                        <span class="text-slate-600 font-semibold">เงินต้นจำลอง:</span>
+                        <span class="font-bold text-slate-800" id="simResPrincipal">0.00 ฿</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-500">ดอกเบี้ยสะสมตามเวลา:</span>
-                        <span class="font-semibold text-amber-600" id="simResInterest">0.00 ฿</span>
+                        <span class="text-slate-600 font-semibold">ดอกเบี้ยสะสมตามเวลา:</span>
+                        <span class="font-bold text-amber-700" id="simResInterest">0.00 ฿</span>
                     </div>
-                    <div class="flex justify-between pt-2 border-t border-blue-200 text-sm font-bold">
-                        <span class="text-blue-800">ยอดรวมสุทธิที่ต้องคืน:</span>
+                    <div class="flex justify-between pt-1.5 border-t border-[#57432c]/30 text-sm font-extrabold">
+                        <span class="text-slate-900">ยอดรวมสุทธิที่ต้องคืน:</span>
                         <span class="text-blue-700" id="simResTotal">0.00 ฿</span>
                     </div>
                 </div>
@@ -362,10 +509,10 @@
     </div>
 
     <!-- Modal ดูรูปภาพขนาดใหญ่ -->
-    <div id="imageModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="closeImageModal()">
+    <div id="imageModal" class="fixed inset-0 bg-slate-900/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="closeImageModal()">
         <div class="relative max-w-full max-h-full">
-            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white text-2xl font-bold">✕ ปิด</button>
-            <img id="modalImagePreview" class="max-w-full max-h-[80vh] rounded-2xl shadow-2xl object-contain">
+            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white text-xl font-bold">✕ ปิด</button>
+            <img id="modalImagePreview" class="max-w-full max-h-[80vh] rounded-2xl border-4 border-white shadow-2xl object-contain">
         </div>
     </div>
 
@@ -375,11 +522,220 @@
         let currentMainTab = 'loans';
         let sharingLoanId = null;
         let currentShareMode = 'balance';
+        let tempBorrowerImage = null;
+        let tempSlipImage = null;
 
-        function getCurrentLocalDateTime() {
+        function compressImageFile(file, maxWidth = 800, quality = 0.75) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = event.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleImageUpload(input, target) {
+            if (!input.files || !input.files[0]) return;
+            try {
+                const compressed = await compressImageFile(input.files[0]);
+                if (target === 'borrower') {
+                    tempBorrowerImage = compressed;
+                    setBorrowerPreview(compressed);
+                } else if (target === 'slip') {
+                    tempSlipImage = compressed;
+                    setSlipPreview(compressed);
+                }
+            } catch (err) {
+                alert('ไม่สามารถโหลดรูปภาพนี้ได้ กรุณาลองใหม่อีกครั้งครับ');
+            }
+        }
+
+        function setBorrowerPreview(dataUrl) {
+            const box = document.getElementById('borrowerPreviewBox');
+            const img = document.getElementById('borrowerPreviewImg');
+            const removeBtn = document.getElementById('removeBorrowerImgBtn');
+            if (dataUrl) {
+                img.src = dataUrl;
+                box.classList.remove('hidden');
+                removeBtn.classList.remove('hidden');
+            } else {
+                img.src = '';
+                box.classList.add('hidden');
+                removeBtn.classList.add('hidden');
+            }
+        }
+
+        function clearBorrowerImage() {
+            tempBorrowerImage = null;
+            document.getElementById('borrowerImage').value = '';
+            setBorrowerPreview(null);
+        }
+
+        function setSlipPreview(dataUrl) {
+            const box = document.getElementById('slipPreviewBox');
+            const img = document.getElementById('slipPreviewImg');
+            const removeBtn = document.getElementById('removeSlipImgBtn');
+            if (dataUrl) {
+                img.src = dataUrl;
+                box.classList.remove('hidden');
+                removeBtn.classList.remove('hidden');
+            } else {
+                img.src = '';
+                box.classList.add('hidden');
+                removeBtn.classList.add('hidden');
+            }
+        }
+
+        function clearSlipImage() {
+            tempSlipImage = null;
+            document.getElementById('paySlip').value = '';
+            setSlipPreview(null);
+        }
+
+        function getCurrentLocalDateTime(offsetDays = 0) {
             const now = new Date();
+            now.setDate(now.getDate() + offsetDays);
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             return now.toISOString().slice(0, 16);
+        }
+
+        function setQuickDueDate(days) {
+            const baseStr = document.getElementById('loanDateTime').value;
+            const baseDate = baseStr ? new Date(baseStr) : new Date();
+            baseDate.setDate(baseDate.getDate() + days);
+            baseDate.setMinutes(baseDate.getMinutes() - baseDate.getTimezoneOffset());
+            document.getElementById('dueDateTime').value = baseDate.toISOString().slice(0, 16);
+        }
+
+        function getDueStatus(loan) {
+            if (!loan.dueDateTime || loan.status === 'paid') return null;
+            const now = new Date();
+            const due = new Date(loan.dueDateTime);
+            const diffMs = due - now;
+            const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+            const dueFormatted = due.toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+            if (diffMs < 0) {
+                const overdueDays = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
+                return {
+                    type: 'overdue',
+                    label: overdueDays === 0 ? 'เลยกำหนดวันนี้!' : `เลยกำหนด ${overdueDays} วัน`,
+                    dueFormatted,
+                    badgeClass: 'bg-rose-600 text-white border-rose-950'
+                };
+            } else if (diffDays <= 3) {
+                return {
+                    type: 'soon',
+                    label: diffDays === 0 ? 'ครบกำหนดวันนี้!' : `อีก ${diffDays} วันครบกำหนด`,
+                    dueFormatted,
+                    badgeClass: 'bg-amber-400 text-slate-950 border-amber-900'
+                };
+            } else {
+                return {
+                    type: 'normal',
+                    label: `กำหนดคืน ${dueFormatted}`,
+                    dueFormatted,
+                    badgeClass: 'bg-sky-100 text-sky-900 border-sky-800'
+                };
+            }
+        }
+
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                alert("เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือนแบบเด้งบนหน้าจอครับ (ยังดูแจ้งเตือนในหน้าเว็บได้ปกติ)");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                updateNotifButtonUI();
+                if (permission === "granted") {
+                    checkAndPushNotifications(true);
+                } else {
+                    alert("กรุณาอนุญาตการแจ้งเตือนในการตั้งค่าเบราว์เซอร์ เพื่อรับแจ้งเตือนเมื่อครบกำหนดชำระครับ");
+                }
+            });
+        }
+
+        function updateNotifButtonUI() {
+            const btn = document.getElementById('notifBtn');
+            if (!("Notification" in window)) return;
+            if (Notification.permission === "granted") {
+                btn.innerText = "🔔 เปิดเตือนแล้ว";
+            }
+        }
+
+        function checkAndPushNotifications(forceTest = false) {
+            const dueItems = [];
+            loans.forEach(loan => {
+                const st = getDueStatus(loan);
+                if (st && (st.type === 'overdue' || st.type === 'soon')) {
+                    const calc = calculateLoanDetails(loan);
+                    dueItems.push(`${loan.name} (${st.label}) - ยอดรวม ${calc.total.toLocaleString('th-TH', {minimumFractionDigits: 2})} ฿`);
+                }
+            });
+
+            if ("Notification" in window && Notification.permission === "granted") {
+                if (dueItems.length > 0) {
+                    const todayKey = 'notified_' + new Date().toISOString().slice(0, 10);
+                    if (forceTest || !sessionStorage.getItem(todayKey)) {
+                        new Notification("⏰ แจ้งเตือนกำหนดชำระหนี้ (" + dueItems.length + " รายการ)", {
+                            body: dueItems.slice(0, 3).join("\n"),
+                        });
+                        sessionStorage.setItem(todayKey, '1');
+                    }
+                } else if (forceTest) {
+                    new Notification("✅ เปิดการแจ้งเตือนสำเร็จ", {
+                        body: "ยังไม่มีรายการที่ใกล้ครบกำหนด หรือเลยกำหนดชำระในขณะนี้ครับ"
+                    });
+                }
+            }
+        }
+
+        function renderDueAlertBanner() {
+            const banner = document.getElementById('dueAlertBanner');
+            const listEl = document.getElementById('dueAlertList');
+            const alertLoans = [];
+
+            loans.forEach(loan => {
+                const st = getDueStatus(loan);
+                if (st && (st.type === 'overdue' || st.type === 'soon')) {
+                    alertLoans.push({ loan, st });
+                }
+            });
+
+            if (alertLoans.length === 0) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            banner.classList.remove('hidden');
+            listEl.innerHTML = alertLoans.map(({ loan, st }) => {
+                const calc = calculateLoanDetails(loan);
+                const textColor = st.type === 'overdue' ? 'text-rose-700 font-bold' : 'text-amber-700 font-bold';
+                return `
+                    <div class="flex justify-between items-center bg-white px-2.5 py-1.5 rounded-lg border border-rose-300">
+                        <span>• <b>${loan.name}</b> <span class="${textColor}">(${st.label})</span></span>
+                        <span class="font-extrabold text-slate-900">${calc.total.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 2})} ฿</span>
+                    </div>
+                `;
+            }).join('');
         }
 
         function initReportDates() {
@@ -392,26 +748,105 @@
         }
         initReportDates();
 
+        function syncTopTabHighlight() {
+            const tLoans = document.getElementById('mTab-loans');
+            const tDue = document.getElementById('mTab-due');
+            const tReport = document.getElementById('mTab-report');
+
+            [tLoans, tDue, tReport].forEach(el => {
+                el.className = 'game-tab game-tab-inactive py-2 px-1 text-[11px] sm:text-xs truncate';
+            });
+
+            if (currentMainTab === 'report') {
+                tReport.className = 'game-tab game-tab-active py-2 px-1 text-[11px] sm:text-xs truncate';
+            } else if (currentFilter === 'due') {
+                tDue.className = 'game-tab game-tab-active py-2 px-1 text-[11px] sm:text-xs truncate';
+            } else {
+                tLoans.className = 'game-tab game-tab-active py-2 px-1 text-[11px] sm:text-xs truncate';
+            }
+        }
+
         function switchMainTab(tab) {
             currentMainTab = tab;
-            const tLoans = document.getElementById('mTab-loans');
-            const tReport = document.getElementById('mTab-report');
             const viewLoans = document.getElementById('view-loans');
             const viewReport = document.getElementById('view-report');
 
             if (tab === 'loans') {
-                tLoans.className = 'flex-1 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white transition';
-                tReport.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-600 transition';
                 viewLoans.classList.remove('hidden');
                 viewReport.classList.add('hidden');
                 renderLoans();
             } else {
-                tReport.className = 'flex-1 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white transition';
-                tLoans.className = 'flex-1 py-2 rounded-xl text-xs font-semibold text-slate-600 transition';
                 viewReport.classList.remove('hidden');
                 viewLoans.classList.add('hidden');
                 renderReport();
             }
+            syncTopTabHighlight();
+        }
+
+        function openDetailModal(loanId) {
+            const loan = loans.find(l => l.id === loanId);
+            if (!loan) return;
+            const calc = calculateLoanDetails(loan);
+            const dueSt = getDueStatus(loan);
+            const loanDateFmt = new Date(loan.loanDateTime).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+            let historyHtml = '<div class="text-slate-500 text-center py-2">ยังไม่มีประวัติการชำระ</div>';
+            if (loan.history && loan.history.length > 0) {
+                historyHtml = loan.history.map(h => {
+                    const hDate = new Date(h.date).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+                    const typeText = h.type === 'interest' ? '<span class="text-amber-700 font-bold">จ่ายดอก</span>' : '<span class="text-blue-700 font-bold">จ่ายลดต้น</span>';
+                    let slipBtn = h.slip ? ` <button onclick="viewImage('${h.slip}')" class="bg-amber-300 text-slate-900 px-1.5 py-0.5 rounded border border-[#57432c] font-bold">🖼️ สลิป</button>` : '';
+                    return `<div class="flex justify-between items-center bg-white px-2.5 py-1.5 rounded-lg border border-[#57432c]/40"><span>${hDate} น. : ${typeText} ${h.note ? '('+h.note+')' : ''} ${slipBtn}</span> <span class="font-extrabold text-slate-900">-${h.amount.toLocaleString()} ฿</span></div>`;
+                }).join('');
+            }
+
+            document.getElementById('detailTitle').innerText = `📋 ${loan.name}`;
+            document.getElementById('detailBody').innerHTML = `
+                <div class="game-card p-3 space-y-1.5">
+                    <div class="flex items-center gap-2.5">
+                        ${loan.image
+                            ? `<img src="${loan.image}" onclick="viewImage('${loan.image}')" class="w-14 h-14 rounded-xl object-cover border-2 border-[#57432c] cursor-pointer">`
+                            : `<div class="w-14 h-14 rounded-xl bg-amber-200 border-2 border-[#57432c] flex items-center justify-center text-xl">👤</div>`}
+                        <div>
+                            <div class="font-extrabold text-sm text-slate-900">${loan.name}</div>
+                            <div class="text-slate-600">${loan.note ? '📞 ' + loan.note : 'ไม่มีหมายเหตุ'}</div>
+                            <div class="text-[11px] text-slate-500">🕒 กู้: ${loanDateFmt} น.</div>
+                        </div>
+                    </div>
+                    ${dueSt ? `<div class="pt-1"><span class="px-2 py-0.5 rounded-md border text-[11px] font-bold ${dueSt.badgeClass}">⏰ ${dueSt.label}</span></div>` : ''}
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#57432c]/25 text-center">
+                        <div class="bg-white/70 p-1.5 rounded-lg">
+                            <span class="block text-[10px] text-slate-500">เงินต้นคงเหลือ</span>
+                            <b class="text-slate-900">${loan.principal.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 2})} ฿</b>
+                        </div>
+                        <div class="bg-white/70 p-1.5 rounded-lg">
+                            <span class="block text-[10px] text-slate-500">ดอกเบี้ย (${calc.days} วัน)</span>
+                            <b class="text-amber-700">+${calc.interest.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ฿</b>
+                        </div>
+                        <div class="bg-white/70 p-1.5 rounded-lg">
+                            <span class="block text-[10px] text-slate-500">ยอดรวมสุทธิ</span>
+                            <b class="text-blue-700">${calc.total.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ฿</b>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card p-3">
+                    <div class="font-bold text-slate-900 mb-1.5">📜 ประวัติการชำระเงิน</div>
+                    <div class="space-y-1.5">${historyHtml}</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    ${loan.status === 'unpaid' ? `<button onclick="closeDetailModal(); openPaymentModal(${loan.id})" class="game-btn-gold py-2.5 text-xs">💰 จ่ายเงิน</button>` : ''}
+                    <button onclick="closeDetailModal(); openShareCustomerModal(${loan.id})" class="bg-indigo-600 text-white border-2 border-[#2c3e68] rounded-xl font-bold py-2.5 text-xs">📤 ส่งยอดลูกค้า</button>
+                    <button onclick="closeDetailModal(); openModal(${loan.id})" class="bg-white text-slate-900 border-2 border-[#2c3e68] rounded-xl font-bold py-2.5 text-xs">✏️ แก้ไข</button>
+                    <button onclick="closeDetailModal(); toggleStatus(${loan.id})" class="bg-slate-800 text-white border-2 border-slate-950 rounded-xl font-bold py-2.5 text-xs">${loan.status === 'unpaid' ? '✔ ปิดยอด' : '↩ เปิดใหม่'}</button>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
         }
 
         function openModal(editId = null) {
@@ -430,7 +865,10 @@
                 document.getElementById('interestType').value = loan.interestType;
                 document.getElementById('interestRate').value = loan.interestRate;
                 document.getElementById('loanDateTime').value = loan.loanDateTime;
+                document.getElementById('dueDateTime').value = loan.dueDateTime || '';
                 document.getElementById('borrowerImage').value = '';
+                tempBorrowerImage = loan.image || null;
+                setBorrowerPreview(tempBorrowerImage);
                 toggleInterestRate();
             } else {
                 modalTitle.innerText = '➕ เพิ่มข้อมูลคนกู้เงิน';
@@ -438,6 +876,9 @@
                 document.getElementById('loanForm').reset();
                 document.getElementById('editId').value = '';
                 document.getElementById('loanDateTime').value = getCurrentLocalDateTime();
+                document.getElementById('dueDateTime').value = '';
+                tempBorrowerImage = null;
+                setBorrowerPreview(null);
                 toggleInterestRate();
             }
             document.getElementById('addModal').classList.remove('hidden');
@@ -451,8 +892,11 @@
             document.getElementById('payLoanId').value = loan.id;
             document.getElementById('payAmount').value = '';
             document.getElementById('payDateTime').value = getCurrentLocalDateTime();
+            document.getElementById('nextDueDateTime').value = '';
             document.getElementById('paySlip').value = '';
             document.getElementById('payNote').value = '';
+            tempSlipImage = null;
+            setSlipPreview(null);
             document.getElementById('paymentModal').classList.remove('hidden');
         }
 
@@ -477,9 +921,9 @@
             ['balance', 'payments', 'both'].forEach(m => {
                 const btn = document.getElementById('shareMode-' + m);
                 if (m === mode) {
-                    btn.className = 'py-2.5 px-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-sm transition text-center';
+                    btn.className = 'py-2 px-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-blue-600 text-white';
                 } else {
-                    btn.className = 'py-2.5 px-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 transition text-center';
+                    btn.className = 'py-2 px-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-[#f8f3e6] text-slate-800';
                 }
             });
             updateSharePreview();
@@ -498,6 +942,11 @@
                 `📋 รายละเอียดบัญชีเงินกู้: ${loan.name}`,
                 `🕒 วันที่กู้: ${loanDateFmt} น. (${typeMap[loan.interestType]})`
             ];
+
+            if (loan.dueDateTime) {
+                const dueFmt = new Date(loan.dueDateTime).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+                lines.push(`⏰ ครบกำหนดชำระ: ${dueFmt} น.`);
+            }
 
             if (mode === 'balance' || mode === 'both') {
                 lines.push(
@@ -607,19 +1056,29 @@
 
         function setFilter(status) {
             currentFilter = status;
-            ['unpaid', 'paid', 'all'].forEach(tab => {
+            ['unpaid', 'due', 'paid', 'all'].forEach(tab => {
                 const el = document.getElementById('tab-' + tab);
                 if (tab === status) {
-                    el.className = 'flex-1 py-2 rounded-xl text-xs font-medium bg-blue-600 text-white shadow-sm transition';
+                    el.className = tab === 'due'
+                        ? 'flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-rose-950 bg-rose-600 text-white'
+                        : 'flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-blue-600 text-white';
                 } else {
-                    el.className = 'flex-1 py-2 rounded-xl text-xs font-medium bg-white text-slate-600 border border-slate-200 transition';
+                    el.className = tab === 'due'
+                        ? 'flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-rose-700 bg-white text-rose-700'
+                        : 'flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border-2 border-[#2c3e68] bg-white text-slate-700';
                 }
             });
+            syncTopTabHighlight();
             renderLoans();
         }
 
         function saveLoans() {
-            localStorage.setItem('loanTrackerMobileData', JSON.stringify(loans));
+            try {
+                localStorage.setItem('loanTrackerMobileData', JSON.stringify(loans));
+            } catch (e) {
+                alert('พื้นที่เก็บข้อมูลในเบราว์เซอร์เต็มครับ ลองลบรูปภาพบางรายการหรือสำรองข้อมูลออกก่อนนะครับ');
+                return;
+            }
             if (currentMainTab === 'loans') renderLoans();
             else renderReport();
         }
@@ -631,27 +1090,14 @@
             const note = document.getElementById('borrowerNote').value.trim();
             const principal = parseFloat(document.getElementById('principal').value);
             const loanDateTime = document.getElementById('loanDateTime').value;
+            const dueDateTime = document.getElementById('dueDateTime').value || null;
             const interestType = document.getElementById('interestType').value;
             const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
-            const imageInput = document.getElementById('borrowerImage');
 
-            if (imageInput.files && imageInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    saveLoanData(editId, name, note, principal, loanDateTime, interestType, interestRate, e.target.result);
-                };
-                reader.readAsDataURL(imageInput.files[0]);
-            } else {
-                let existingImage = null;
-                if (editId) {
-                    const existingLoan = loans.find(l => l.id == editId);
-                    if (existingLoan) existingImage = existingLoan.image;
-                }
-                saveLoanData(editId, name, note, principal, loanDateTime, interestType, interestRate, existingImage);
-            }
+            saveLoanData(editId, name, note, principal, loanDateTime, dueDateTime, interestType, interestRate, tempBorrowerImage);
         });
 
-        function saveLoanData(editId, name, note, principal, loanDateTime, interestType, interestRate, imageData) {
+        function saveLoanData(editId, name, note, principal, loanDateTime, dueDateTime, interestType, interestRate, imageData) {
             if (editId) {
                 const loan = loans.find(l => l.id == editId);
                 if (loan) {
@@ -659,9 +1105,10 @@
                     loan.note = note;
                     loan.principal = principal;
                     loan.loanDateTime = loanDateTime;
+                    loan.dueDateTime = dueDateTime;
                     loan.interestType = interestType;
                     loan.interestRate = interestRate;
-                    if (imageData) loan.image = imageData;
+                    loan.image = imageData;
                 }
             } else {
                 const newLoan = {
@@ -670,6 +1117,7 @@
                     note: note,
                     principal: principal,
                     loanDateTime: loanDateTime,
+                    dueDateTime: dueDateTime,
                     interestType: interestType,
                     interestRate: interestRate,
                     status: 'unpaid',
@@ -689,25 +1137,17 @@
             const type = document.getElementById('payType').value;
             let amount = parseFloat(document.getElementById('payAmount').value);
             const payDateTime = document.getElementById('payDateTime').value;
+            const nextDueDateTime = document.getElementById('nextDueDateTime').value;
             const note = document.getElementById('payNote').value.trim();
-            const slipInput = document.getElementById('paySlip');
 
             const loan = loans.find(l => l.id === loanId);
             if (!loan) return;
             if (!loan.history) loan.history = [];
 
-            if (slipInput.files && slipInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    processPayment(loan, type, amount, payDateTime, note, e.target.result);
-                };
-                reader.readAsDataURL(slipInput.files[0]);
-            } else {
-                processPayment(loan, type, amount, payDateTime, note, null);
-            }
+            processPayment(loan, type, amount, payDateTime, nextDueDateTime, note, tempSlipImage);
         });
 
-        function processPayment(loan, type, amount, payDateTime, note, slipImage) {
+        function processPayment(loan, type, amount, payDateTime, nextDueDateTime, note, slipImage) {
             if (type === 'principal') {
                 if (amount > loan.principal) {
                     alert('ยอดจ่ายลดต้น มากกว่าเงินต้นคงเหลือ!');
@@ -761,6 +1201,10 @@
                         slip: slipImage
                     });
                 }
+            }
+
+            if (nextDueDateTime) {
+                loan.dueDateTime = nextDueDateTime;
             }
 
             loan.history.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -820,7 +1264,21 @@
             return { days: fullDays, interest: currentInterest, total: loan.principal + currentInterest };
         }
 
+        function getNameplateGradient(index, dueSt) {
+            if (dueSt && dueSt.type === 'overdue') {
+                return 'background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);';
+            }
+            const palettes = [
+                'background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);', // ส้มทอง
+                'background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);', // ฟ้า
+                'background: linear-gradient(180deg, #c084fc 0%, #9333ea 100%);', // ม่วง
+                'background: linear-gradient(180deg, #34d399 0%, #059669 100%);'  // เขียว
+            ];
+            return palettes[index % palettes.length];
+        }
+
         function renderLoans() {
+            renderDueAlertBanner();
             const listContainer = document.getElementById('loanList');
             const emptyState = document.getElementById('emptyState');
             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -838,7 +1296,11 @@
             });
 
             const filteredLoans = loans.filter(loan => {
-                const matchName = loan.name.toLowerCase().includes(search) || loan.note.toLowerCase().includes(search);
+                const matchName = loan.name.toLowerCase().includes(search) || (loan.note || '').toLowerCase().includes(search);
+                if (currentFilter === 'due') {
+                    const st = getDueStatus(loan);
+                    return matchName && st && (st.type === 'overdue' || st.type === 'soon');
+                }
                 const matchStatus = currentFilter === 'all' || loan.status === currentFilter;
                 return matchName && matchStatus;
             });
@@ -846,69 +1308,53 @@
             if (filteredLoans.length === 0) emptyState.classList.remove('hidden');
             else emptyState.classList.add('hidden');
 
-            filteredLoans.forEach(loan => {
+            filteredLoans.forEach((loan, idx) => {
                 const calc = calculateLoanDetails(loan);
-                const dateFormatted = new Date(loan.loanDateTime).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+                const dueSt = getDueStatus(loan);
+                const rateText = loan.interestType === 'none'
+                    ? '0%'
+                    : `${loan.interestRate}%/${loan.interestType === 'daily' ? 'ว.' : 'ด.'}`;
 
-                let interestBadge = '<span class="px-2.5 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600">ไม่คิดดอกเบี้ย</span>';
-                if (loan.interestType === 'daily') interestBadge = `<span class="px-2.5 py-0.5 text-xs rounded-full bg-orange-100 text-orange-700 font-medium">รายวัน ${loan.interestRate}%</span>`;
-                else if (loan.interestType === 'monthly') interestBadge = `<span class="px-2.5 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 font-medium">รายเดือน ${loan.interestRate}%</span>`;
+                const avatarHtml = loan.image
+                    ? `<img src="${loan.image}" onclick="event.stopPropagation(); viewImage('${loan.image}')" class="w-16 h-16 rounded-xl object-cover border-2 border-[#57432c] shadow-xs cursor-pointer mx-auto">`
+                    : `<div class="w-16 h-16 rounded-xl bg-amber-100/90 border-2 border-[#57432c] flex items-center justify-center text-2xl mx-auto">👤</div>`;
 
-                let avatarHtml = loan.image 
-                    ? `<img src="${loan.image}" onclick="viewImage('${loan.image}')" class="w-12 h-12 rounded-full object-cover border-2 border-blue-500 shadow-sm shrink-0 cursor-pointer">`
-                    : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-lg shrink-0 border border-slate-200">👤</div>`;
-
-                let historyHtml = '';
-                if (loan.history && loan.history.length > 0) {
-                    historyHtml += '<div class="mt-2.5 pt-2 border-t border-dashed border-slate-200 text-[11px] text-slate-500 space-y-1.5"><div class="font-medium text-slate-600">📜 ประวัติการชำระ:</div>';
-                    loan.history.forEach(h => {
-                        const hDate = new Date(h.date).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-                        const typeText = h.type === 'interest' ? '<span class="text-amber-600 font-medium">จ่ายดอก</span>' : '<span class="text-blue-600 font-medium">จ่ายลดต้น</span>';
-                        let slipBtn = h.slip ? ` <button onclick="viewImage('${h.slip}')" class="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-200 font-medium">🖼️ ดูสลิป</button>` : '';
-                        historyHtml += `<div class="flex justify-between items-center bg-slate-50 px-2 py-1.5 rounded"><span>${hDate} น. : ${typeText} ${h.note ? '('+h.note+')' : ''} ${slipBtn}</span> <span class="font-semibold text-slate-700">-${h.amount.toLocaleString()} ฿</span></div>`;
-                    });
-                    historyHtml += '</div>';
-                }
+                const statusSubText = dueSt
+                    ? `<span class="font-bold ${dueSt.type === 'overdue' ? 'text-rose-700' : 'text-amber-800'}">${dueSt.label}</span>`
+                    : `<span>ดอก ${rateText} • ${calc.days}ว.</span>`;
 
                 const card = document.createElement('div');
-                card.className = `bg-white rounded-2xl p-4 shadow-sm border border-slate-100 ${loan.status === 'paid' ? 'opacity-65' : ''}`;
+                card.onclick = () => openDetailModal(loan.id);
+                card.className = `game-card p-2 flex flex-col justify-between cursor-pointer transition hover:-translate-y-0.5 ${loan.status === 'paid' ? 'opacity-65' : ''}`;
                 card.innerHTML = `
-                    <div class="flex justify-between items-start gap-3">
-                        <div class="flex items-center gap-3">
+                    <div>
+                        <div class="game-nameplate px-2 py-1 text-center text-[11px] sm:text-xs truncate" style="${getNameplateGradient(idx, dueSt)}">
+                            ${loan.name}
+                        </div>
+
+                        <div class="my-2 text-center relative">
                             ${avatarHtml}
-                            <div>
-                                <div class="font-bold text-base text-slate-800">${loan.name}</div>
-                                <div class="text-xs text-slate-400 mt-0.5">${loan.note ? '📞 ' + loan.note : 'ไม่มีหมายเหตุ'}</div>
+                            <div class="text-[11px] font-extrabold text-slate-900 mt-1">
+                                ต้น ${loan.principal.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 0})} ฿
+                            </div>
+                            <div class="text-[10px] text-slate-600 truncate">
+                                ${statusSubText}
                             </div>
                         </div>
-                        ${interestBadge}
                     </div>
 
-                    <div class="mt-3 pt-3 border-t border-slate-100 grid grid-cols-3 gap-2 text-xs">
-                        <div>
-                            <span class="text-slate-400 block">เงินต้นคงเหลือ</span>
-                            <span class="font-semibold text-sm text-slate-700">${loan.principal.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 2})} ฿</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block">ดอกเบี้ย (${calc.days} วัน)</span>
-                            <span class="font-semibold text-sm text-amber-600">+${calc.interest.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ฿</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-slate-400 block">ยอดรวมสุทธิ</span>
-                            <span class="font-bold text-base text-blue-600">${calc.total.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ฿</span>
-                        </div>
-                    </div>
+                    <div class="space-y-1.5">
+                        ${loan.status === 'unpaid'
+                            ? `<button onclick="event.stopPropagation(); openPaymentModal(${loan.id})" class="game-btn-gold w-full py-1 text-xs flex items-center justify-center gap-1">
+                                <span>💰</span>
+                                <span>${calc.total.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 2})}</span>
+                               </button>`
+                            : `<div class="w-full py-1 text-[11px] font-bold text-center rounded-lg bg-emerald-200 text-emerald-900 border border-emerald-800">✔ ชำระแล้ว</div>`}
 
-                    ${historyHtml}
-
-                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center gap-2">
-                        <div class="text-[11px] text-slate-400 shrink-0">🕒 กู้: ${dateFormatted} น.</div>
-                        <div class="flex gap-1.5 flex-wrap justify-end">
-                            <button onclick="openShareCustomerModal(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-indigo-50 text-indigo-700 active:bg-indigo-100 font-medium">📤 ส่งยอด</button>
-                            ${loan.status === 'unpaid' ? `<button onclick="openPaymentModal(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-emerald-50 text-emerald-700 active:bg-emerald-100 font-medium">💰 จ่ายเงิน</button>` : ''}
-                            <button onclick="openModal(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-sky-50 text-sky-600 active:bg-sky-100 font-medium">✏️ แก้ไข</button>
-                            <button onclick="deleteLoan(${loan.id})" class="px-2.5 py-1.5 text-xs rounded-lg bg-red-50 text-red-600 active:bg-red-100 font-medium">ลบ</button>
-                            <button onclick="toggleStatus(${loan.id})" class="px-3 py-1.5 text-xs rounded-lg font-medium ${loan.status === 'unpaid' ? 'bg-slate-800 text-white active:bg-slate-900' : 'bg-slate-200 text-slate-700'}">${loan.status === 'unpaid' ? '✔ ปิดยอด' : '↩ เปิดใหม่'}</button>
+                        <div class="grid grid-cols-3 gap-1 text-[10px] font-bold">
+                            <button onclick="event.stopPropagation(); openShareCustomerModal(${loan.id})" class="bg-indigo-100 text-indigo-900 border border-indigo-800 rounded-md py-0.5">ส่งยอด</button>
+                            <button onclick="event.stopPropagation(); openModal(${loan.id})" class="bg-sky-100 text-sky-900 border border-sky-800 rounded-md py-0.5">แก้ไข</button>
+                            <button onclick="event.stopPropagation(); deleteLoan(${loan.id})" class="bg-rose-100 text-rose-900 border border-rose-800 rounded-md py-0.5">ลบ</button>
                         </div>
                     </div>
                 `;
@@ -961,23 +1407,23 @@
             historyListEl.innerHTML = '';
 
             if (allPayments.length === 0) {
-                historyListEl.innerHTML = '<div class="text-center py-4 text-slate-400">ไม่มีรายการในช่วงเวลานี้</div>';
+                historyListEl.innerHTML = '<div class="text-center py-4 text-slate-600 font-medium">ไม่มีรายการในช่วงเวลานี้</div>';
                 return;
             }
 
             allPayments.forEach(p => {
                 const dateFmt = new Date(p.date).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-                const typeText = p.type === 'interest' ? '<span class="text-amber-600 font-semibold">ดอกเบี้ย</span>' : '<span class="text-blue-600 font-semibold">ลดต้น</span>';
-                let slipBtn = p.slip ? ` <button onclick="viewImage('${p.slip}')" class="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-200">🖼️ สลิป</button>` : '';
+                const typeText = p.type === 'interest' ? '<span class="text-amber-700 font-bold">ดอกเบี้ย</span>' : '<span class="text-blue-700 font-bold">ลดต้น</span>';
+                let slipBtn = p.slip ? ` <button onclick="viewImage('${p.slip}')" class="bg-amber-300 text-slate-900 px-1.5 py-0.5 rounded border border-[#57432c] font-bold">🖼️ สลิป</button>` : '';
 
                 const item = document.createElement('div');
-                item.className = 'flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100';
+                item.className = 'flex justify-between items-center bg-[#f8f3e6] p-2.5 rounded-xl border-2 border-[#57432c]';
                 item.innerHTML = `
                     <div>
-                        <div class="font-bold text-slate-700">${p.borrowerName} <span class="font-normal text-slate-500">(${typeText})</span></div>
-                        <div class="text-[10px] text-slate-400">${dateFmt} น. ${p.note ? '• ' + p.note : ''} ${slipBtn}</div>
+                        <div class="font-bold text-slate-900">${p.borrowerName} <span class="font-normal text-slate-600">(${typeText})</span></div>
+                        <div class="text-[10px] text-slate-600">${dateFmt} น. ${p.note ? '• ' + p.note : ''} ${slipBtn}</div>
                     </div>
-                    <div class="font-bold text-emerald-600">+${p.amount.toLocaleString('th-TH', {minimumFractionDigits: 2})} ฿</div>
+                    <div class="font-extrabold text-emerald-700">+${p.amount.toLocaleString('th-TH', {minimumFractionDigits: 2})} ฿</div>
                 `;
                 historyListEl.appendChild(item);
             });
@@ -1028,12 +1474,12 @@
 
         function exportData() {
             if (loans.length === 0) return alert('ยังไม่มีข้อมูลสำหรับสำรอง');
-            let csv = '\uFEFFชื่อผู้กู้,หมายเหตุ,วันเวลาที่กู้,เงินต้นคงเหลือ,รูปแบบดอกเบี้ย,อัตรา(%),จำนวนวัน,ดอกเบี้ยสะสม,ยอดรวมสุทธิ,สถานะ\n';
+            let csv = '\uFEFFชื่อผู้กู้,หมายเหตุ,วันเวลาที่กู้,วันครบกำหนด,เงินต้นคงเหลือ,รูปแบบดอกเบี้ย,อัตรา(%),จำนวนวัน,ดอกเบี้ยสะสม,ยอดรวมสุทธิ,สถานะ\n';
             loans.forEach(l => {
                 const c = calculateLoanDetails(l);
                 const typeMap = { none: 'ไม่คิดดอกเบี้ย', daily: 'รายวัน', monthly: 'รายเดือน' };
                 const statusMap = { unpaid: 'ยังไม่ชำระ', paid: 'ชำระแล้ว' };
-                csv += `"${l.name}","${l.note}","${l.loanDateTime}",${l.principal},"${typeMap[l.interestType]}",${l.interestRate},${c.days},${c.interest.toFixed(2)},${c.total.toFixed(2)},"${statusMap[l.status]}"\n`;
+                csv += `"${l.name}","${l.note}","${l.loanDateTime}","${l.dueDateTime || '-'}",${l.principal},"${typeMap[l.interestType]}",${l.interestRate},${c.days},${c.interest.toFixed(2)},${c.total.toFixed(2)},"${statusMap[l.status]}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -1043,7 +1489,9 @@
             a.click();
         }
 
+        updateNotifButtonUI();
         renderLoans();
+        checkAndPushNotifications(false);
     </script>
 </body>
 </html>
